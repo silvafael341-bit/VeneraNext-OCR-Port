@@ -4,7 +4,7 @@ import android.graphics.BitmapFactory
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
-/** Android bridge for the embedded page-translation pipeline. */
+/** Bridge for the embedded page-translation pipeline. */
 class TranslationEmbedPlugin : MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method != "translateImage") {
@@ -23,10 +23,11 @@ class TranslationEmbedPlugin : MethodChannel.MethodCallHandler {
             result.error("INVALID_IMAGE", "Unable to decode image", null)
             return
         }
-        bitmap.recycle()
 
-        // The OCR/translation engine will be connected in the next stage.
-        // null instructs the Dart side to keep the original page.
+        // OCR/translation engine is intentionally kept behind this bridge.
+        // The next integration stage replaces this fallback with the actual
+        // Venera-SSR OCR -> translation -> rendering pipeline.
+        bitmap.recycle()
         result.success(null)
     }
 }
