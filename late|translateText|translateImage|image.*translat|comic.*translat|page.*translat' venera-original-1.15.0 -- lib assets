@@ -1,0 +1,29 @@
+[35mvenera-original-1.15.0:lib/components/appbar.dart[m[36m:[m[32m5[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/components/button.dart[m[36m:[m[32m3[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/components/js_ui.dart[m[36m:[m[32m9[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/components/loading.dart[m[36m:[m[32m10[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/components/message.dart[m[36m:[m[32m8[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/components/pop_up_widget.dart[m[36m:[m[32m7[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/brightness.dart[m[36m:[m[32m2[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/chapter_comments.dart[m[36m:[m[32m15[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/chapters.dart[m[36m:[m[32m9[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/comic_image.dart[m[36m:[m[32m9[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/gesture.dart[m[36m:[m[32m13[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/images.dart[m[36m:[m[32m26[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/scaffold.dart[m[36m:[m[32m29[m[36m:[mimport 'package:venera_next/foundation/[1;31mtranslation[ms.dart';
+[35mvenera-original-1.15.0:lib/features/reader/scaffold.dart[m[36m:[m[32m400[m[36m:[m      var [1;31mtranslate[mdTags = tags.map((e) => e.[1;31mtranslate[mTagsToCN).toList();
+[35mvenera-original-1.15.0:lib/features/reader/scaffold.dart[m[36m:[m[32m428[m[36m:[m              [1;31mtranslate[mdTags,
+[35mvenera-original-1.15.0:lib/foundation/opencc.dart[m[36m:[m[32m5[m[36m:[mabstract class [1;31mOpenCC[m {
+[35mvenera-original-1.15.0:lib/foundation/opencc.dart[m[36m:[m[32m10[m[36m:[m    var data = await rootBundle.load("assets/[1;31mopencc[m.txt");
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m7[m[36m:[mextension App[1;31mTranslation[m on String {
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m8[m[36m:[m  String _[1;31mtranslate[m() {
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m14[m[36m:[m    return ([1;31mtranslation[ms[key]?[this]) ?? this;
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m17[m[36m:[m  String get tl => _[1;31mtranslate[m();
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m19[m[36m:[m  String get tlEN => [1;31mtranslation[ms["en_US"]?[this] ?? this;
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m22[m[36m:[m    var res = _[1;31mtranslate[m();
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m29[m[36m:[m  static Map<String, Map<String, String>> [1;31mtranslation[ms = const {};
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m32[m[36m:[m    var data = await rootBundle.load("assets/[1;31mtranslation[m.json");
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m34[m[36m:[m    [1;31mtranslation[ms = {
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m40[m[36m:[mextension List[1;31mTranslation[m on List<String> {
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m41[m[36m:[m  List<String> _[1;31mtranslate[m() {
+[35mvenera-original-1.15.0:lib/foundation/translations.dart[m[36m:[m[32m45[m[36m:[m  List<String> get tl => _[1;31mtranslate[m();
