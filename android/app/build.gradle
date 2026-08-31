@@ -27,7 +27,19 @@ if (flutterVersionName == null) {
 
 def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def hasKeystoreProperties = keystorePropertiesFile.exists()
+if (hasKeystoreProperties) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+def configureSigning = { signingConfig ->
+    if (hasKeystoreProperties) {
+        signingConfig.storeFile = file(keystoreProperties['storeFile'])
+        signingConfig.storePassword = keystoreProperties['storePassword']
+        signingConfig.keyAlias = keystoreProperties['keyAlias']
+        signingConfig.keyPassword = keystoreProperties['keyPassword']
+    }
+}
 
 android {
     namespace = "com.github.cyrilpeng.veneranext"
@@ -40,7 +52,7 @@ android {
         }
     }
 
-    splits{
+    splits {
         abi {
             reset()
             include 'armeabi-v7a', 'arm64-v8a', 'x86_64'
@@ -53,22 +65,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions{
+    kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17
     }
 
     signingConfigs {
         debug {
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
+            configureSigning(delegate)
         }
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            configureSigning(delegate)
         }
     }
 
@@ -87,13 +93,17 @@ android {
             ndk {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
             }
-            signingConfig signingConfigs.release
+            if (hasKeystoreProperties) {
+                signingConfig signingConfigs.release
+            }
         }
         debug {
             ndk {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
             }
-            signingConfig signingConfigs.debug
+            if (hasKeystoreProperties) {
+                signingConfig signingConfigs.debug
+            }
         }
     }
 
