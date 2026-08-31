@@ -25,10 +25,6 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
-import com.manga.translate.ApiFormat
-import com.manga.translate.ApiSettings
-import com.manga.translate.SettingsStore
-import com.github.kiastr.venera_ssr.translate.TranslatePlugin
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
@@ -36,7 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger
 class MainActivity : FlutterFragmentActivity() {
     var volumeListen = VolumeListen()
     var listening = false
-
     private val storageRequestCode = 0x10
     private var storagePermissionRequest: ((Boolean) -> Unit)? = null
     private val nextLocalRequestCode = AtomicInteger()
@@ -62,9 +57,7 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     private fun <I, O> startContractForResult(
-        contract: ActivityResultContract<I, O>,
-        input: I,
-        callback: ActivityResultCallback<O>
+        contract: ActivityResultContract<I, O>, input: I, callback: ActivityResultCallback<O>
     ) {
         val key = "activity_rq_for_result#${nextLocalRequestCode.getAndIncrement()}"
         val registry = activityResultRegistry
@@ -89,14 +82,12 @@ class MainActivity : FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
 
-        // Use the real Venera-SSR embedded translation bridge. The Dart contract
-        // remains com.github.kiastr.venera_next/translate, so the Reader does not
-        // need a second channel.
-        ensureGooglePublicTranslationDefault()
+        // Same Dart channel as before, now backed by the SSR OCR/bubble detector
+        // and BubbleRenderer, with our Portuguese translation adapter.
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             "com.github.kiastr.venera_next/translate"
-        ).setMethodCallHandler(TranslatePlugin(this))
+        ).setMethodCallHandler(VeneraSsrEmbeddedPlugin(this))
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "venera/method_channel")
             .setMethodCallHandler { call, res ->
@@ -154,16 +145,6 @@ class MainActivity : FlutterFragmentActivity() {
         )
     }
 
-    private fun ensureGooglePublicTranslationDefault() {
-        runCatching {
-            val store = SettingsStore(this)
-            val current = store.load()
-            if (current.apiFormat != ApiFormat.GOOGLE_PUBLIC) {
-                store.save(ApiSettings("", "", "", ApiFormat.GOOGLE_PUBLIC))
-            }
-        }.onFailure { Log.w("VeneraNext", "Unable to initialize translation defaults", it) }
-    }
-
     private fun getProxy(): String {
         val host = System.getProperty("http.proxyHost")
         val port = System.getProperty("http.proxyPort")
@@ -190,9 +171,8 @@ class MainActivity : FlutterFragmentActivity() {
             }
         }
         val resolver = contentResolver
-        var tmp = cacheDir
         val dirName = DocumentFile.fromTreeUri(this, uri)?.name ?: "selected"
-        tmp = File(tmp, dirName)
+        val tmp = File(cacheDir, dirName)
         if (tmp.exists()) tmp.deleteRecursively()
         tmp.mkdir()
         Thread {
