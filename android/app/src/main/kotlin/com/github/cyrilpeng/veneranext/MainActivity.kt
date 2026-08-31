@@ -104,6 +104,12 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         GeneratedPluginRegistrant.registerWith(flutterEngine)
+
+        MethodChannel(
+            flutterEngine.dartExecutor.binaryMessenger,
+            "com.github.kiastr.venera_next/translate"
+        ).setMethodCallHandler(TranslationEmbedPlugin())
+
         MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             "venera/method_channel"
