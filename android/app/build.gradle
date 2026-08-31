@@ -74,9 +74,7 @@ android {
 
     defaultConfig {
         applicationId = "com.github.cyrilpeng.veneranext"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
@@ -120,9 +118,7 @@ android {
     }
 
     dependenciesInfo {
-        // Disables dependency metadata when building APKs.
         includeInApk = false
-        // Disables dependency metadata when building Android App Bundles.
         includeInBundle = false
     }
 }
@@ -133,5 +129,11 @@ flutter {
 
 dependencies {
     implementation "androidx.activity:activity-ktx:1.10.1"
-    implementation 'androidx.documentfile:documentfile:1.0.1'
+    implementation "androidx.documentfile:documentfile:1.0.1"
+
+    // Bundled ML Kit models: available immediately after installation.
+    implementation "com.google.mlkit:text-recognition:16.0.1"
+    implementation "com.google.mlkit:text-recognition-chinese:16.0.1"
+    implementation "com.google.mlkit:text-recognition-japanese:16.0.1"
+    implementation "com.google.mlkit:text-recognition-korean:16.0.1"
 }
