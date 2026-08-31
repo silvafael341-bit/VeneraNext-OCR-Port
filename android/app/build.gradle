@@ -1,7 +1,6 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -10,27 +9,16 @@ ext.abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2, "x86_64": 3]
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader("UTF-8") { reader ->
-        localProperties.load(reader)
-    }
+    localPropertiesFile.withReader("UTF-8") { reader -> localProperties.load(reader) }
 }
 
-def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
-if (flutterVersionCode == null) {
-    flutterVersionCode = "1"
-}
-
-def flutterVersionName = localProperties.getProperty("flutter.versionName")
-if (flutterVersionName == null) {
-    flutterVersionName = "1.0"
-}
+def flutterVersionCode = localProperties.getProperty("flutter.versionCode") ?: "1"
+def flutterVersionName = localProperties.getProperty("flutter.versionName") ?: "1.0"
 
 def keystorePropertiesFile = rootProject.file("key.properties")
 def keystoreProperties = new Properties()
 def hasKeystoreProperties = keystorePropertiesFile.exists()
-if (hasKeystoreProperties) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
+if (hasKeystoreProperties) keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 def configureSigning = { signingConfig ->
     if (hasKeystoreProperties) {
@@ -46,9 +34,20 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion "28.0.13004108"
 
-    packaging {
-        jniLibs {
-            useLegacyPackaging true
+    packaging { jniLibs { useLegacyPackaging true } }
+
+    sourceSets {
+        main {
+            // Compile the pinned Venera-SSR Android translation core directly.
+            java.srcDirs += [
+                "${rootProject.projectDir}/../vendor/venera-ssr/android/app/src/main/kotlin"
+            ]
+            res.srcDirs += [
+                "${rootProject.projectDir}/../vendor/venera-ssr/android/app/src/main/res"
+            ]
+            assets.srcDirs += [
+                "${rootProject.projectDir}/../vendor/venera-ssr/android/app/src/main/assets"
+            ]
         }
     }
 
@@ -65,22 +64,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
-    }
+    kotlinOptions { jvmTarget = JavaVersion.VERSION_17 }
 
     signingConfigs {
-        debug {
-            configureSigning(delegate)
-        }
-        release {
-            configureSigning(delegate)
-        }
+        debug { configureSigning(delegate) }
+        release { configureSigning(delegate) }
     }
 
     defaultConfig {
         applicationId = "com.github.cyrilpeng.veneranext"
-        minSdk = 23
+        // Venera-SSR's ONNX/native translation stack requires API 24 here.
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
@@ -90,20 +84,12 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            ndk {
-                abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
-            }
-            if (hasKeystoreProperties) {
-                signingConfig signingConfigs.release
-            }
+            ndk { abiFilters "armeabi-v7a", "arm64-v8a", "x86_64" }
+            if (hasKeystoreProperties) signingConfig signingConfigs.release
         }
         debug {
-            ndk {
-                abiFilters "armeabi-v7a", "arm64-v8a", "x86_64"
-            }
-            if (hasKeystoreProperties) {
-                signingConfig signingConfigs.debug
-            }
+            ndk { abiFilters "armeabi-v7a", "arm64-v8a", "x86_64" }
+            if (hasKeystoreProperties) signingConfig signingConfigs.debug
         }
     }
 
@@ -114,9 +100,7 @@ android {
                 if (abi != null) {
                     outputFileName = "VeneraNext-${variant.versionName}-android-${abi}.apk"
                     def abiVersionCode = project.ext.abiCodes.get(abi)
-                    if (abiVersionCode != null) {
-                        versionCodeOverride = variant.versionCode * 10 + abiVersionCode
-                    }
+                    if (abiVersionCode != null) versionCodeOverride = variant.versionCode * 10 + abiVersionCode
                 } else {
                     outputFileName = "VeneraNext-${variant.versionName}-android.apk"
                     versionCodeOverride = variant.versionCode * 10
@@ -133,17 +117,26 @@ android {
     }
 }
 
-flutter {
-    source = "../.."
-}
+flutter { source = "../.." }
 
 dependencies {
     implementation "androidx.activity:activity-ktx:1.10.1"
     implementation "androidx.documentfile:documentfile:1.0.1"
 
-    // Bundled ML Kit models: available immediately after installation.
+    // Existing native OCR models.
     implementation "com.google.mlkit:text-recognition:16.0.1"
     implementation "com.google.mlkit:text-recognition-chinese:16.0.1"
     implementation "com.google.mlkit:text-recognition-japanese:16.0.1"
     implementation "com.google.mlkit:text-recognition-korean:16.0.1"
+
+    // Venera-SSR embedded translation core.
+    implementation "org.opencv:opencv:4.11.0"
+    implementation "com.microsoft.onnxruntime:onnxruntime-android:1.23.0"
+    implementation "org.tensorflow:tensorflow-lite:2.17.0"
+    implementation "io.github.awxkee:avif-coder:2.2.1"
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0"
+    implementation "androidx.appcompat:appcompat:1.7.0"
+    implementation "androidx.recyclerview:recyclerview:1.3.2"
+    implementation "androidx.core:core-ktx:1.13.1"
 }
