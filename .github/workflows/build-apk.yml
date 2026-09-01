@@ -24,12 +24,16 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
-        with:
-          flutter-version: '3.29.3'
-          channel: stable
-          cache: true
+      - name: Install Flutter 3.29.3
+        shell: bash
+        run: |
+          set -euo pipefail
+          FLUTTER_DIR="$RUNNER_TEMP/flutter"
+          git clone --depth 1 --branch 3.29.3 https://github.com/flutter/flutter.git "$FLUTTER_DIR"
+          echo "$FLUTTER_DIR/bin" >> "$GITHUB_PATH"
+          echo "PUB_CACHE=$RUNNER_TEMP/pub-cache" >> "$GITHUB_ENV"
+          "$FLUTTER_DIR/bin/flutter" --version
+          "$FLUTTER_DIR/bin/flutter" precache --android
 
       - name: Extract project archive
         shell: bash
@@ -83,5 +87,3 @@ jobs:
           name: VeneraNext-OCR-debug
           path: /tmp/apk-output/VeneraNext-OCR-debug.apk
           if-no-files-found: error
-
-# CI trigger after GitHub Actions was enabled.
