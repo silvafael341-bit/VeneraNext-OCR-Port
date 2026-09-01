@@ -30,8 +30,6 @@ def configureSigning = { signingConfig ->
 }
 
 android {
-    // Keep the recovered VeneraNext applicationId, but use the SSR namespace so
-    // the imported SSR sources resolve their generated com.github.kiastr.venera_ssr.R.
     namespace = "com.github.kiastr.venera_ssr"
     compileSdk = flutter.compileSdkVersion
     ndkVersion "28.0.13004108"
@@ -40,12 +38,12 @@ android {
 
     sourceSets {
         main {
+            // SSR Kotlin sources are embedded into the main application.
             java.srcDirs += [
                 "${rootProject.projectDir}/../vendor/venera-ssr/android/app/src/main/kotlin"
             ]
-            res.srcDirs += [
-                "${rootProject.projectDir}/../vendor/venera-ssr/android/app/src/main/res"
-            ]
+            // Do NOT import SSR res/: VeneraNext already owns the launcher/theme
+            // resources and importing both trees creates duplicate Android resources.
             assets.srcDirs += [
                 "${rootProject.projectDir}/../vendor/venera-ssr/android/app/src/main/assets"
             ]
@@ -122,14 +120,10 @@ flutter { source = "../.." }
 dependencies {
     implementation "androidx.activity:activity-ktx:1.10.1"
     implementation "androidx.documentfile:documentfile:1.0.1"
-
-    // Existing bundled OCR engines.
     implementation "com.google.mlkit:text-recognition:16.0.1"
     implementation "com.google.mlkit:text-recognition-chinese:16.0.1"
     implementation "com.google.mlkit:text-recognition-japanese:16.0.1"
     implementation "com.google.mlkit:text-recognition-korean:16.0.1"
-
-    // Venera-SSR embedded OCR/bubble detection/rendering stack.
     implementation "org.opencv:opencv:4.11.0"
     implementation "com.microsoft.onnxruntime:onnxruntime-android:1.23.0"
     implementation "org.tensorflow:tensorflow-lite:2.17.0"
