@@ -2,8 +2,7 @@ name: Android OCR build
 
 on:
   push:
-    branches:
-      - rebuild-venera-ocr-integrated
+    branches: [rebuild-venera-ocr-integrated]
   workflow_dispatch:
 
 permissions:
@@ -18,27 +17,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Flutter without third-party action
+      - name: Install Java 17
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y openjdk-17-jdk
+          JAVA_HOME_DIR="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
+          echo "JAVA_HOME=$JAVA_HOME_DIR" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_DIR/bin" >> "$GITHUB_PATH"
+          echo "org.gradle.java.home=$JAVA_HOME_DIR" >> "$GITHUB_WORKSPACE/android/gradle.properties"
+          "$JAVA_HOME_DIR/bin/java" -version
+
+      - name: Install Flutter 3.41.4
         run: |
           git clone --depth 1 --branch 3.41.4 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
           echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
           "$RUNNER_TEMP/flutter/bin/flutter" --version
-
-      - name: Configure Java 17
-        run: |
-          JAVA17="$(find /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk -type f -path '*/17*/bin/java' -print -quit)"
-          if [ -z "$JAVA17" ]; then
-            JAVA17="$(find /usr/lib/jvm -type f -path '*/java-17*/bin/java' -print -quit)"
-          fi
-          if [ -z "$JAVA17" ]; then
-            echo 'ERROR: Java 17 executable not found.'
-            exit 1
-          fi
-          JAVA_HOME_DIR="$(dirname "$(dirname "$JAVA17")")"
-          echo "JAVA_HOME=$JAVA_HOME_DIR" >> "$GITHUB_ENV"
-          echo "$JAVA_HOME_DIR/bin" >> "$GITHUB_PATH"
-          echo "org.gradle.java.home=$JAVA_HOME_DIR" >> "$GITHUB_WORKSPACE/android/gradle.properties"
-          "$JAVA17" -version
 
       - name: Prepare Rust toolchain
         run: |
