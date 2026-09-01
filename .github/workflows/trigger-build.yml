@@ -1,0 +1,16 @@
+name: Trigger Android build
+
+on:
+  push:
+    branches:
+      - rebuild-venera-ocr-integrated
+
+permissions:
+  contents: read
+
+jobs:
+  trigger:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Trigger main Android build
+        run: echo "Android OCR build trigger is active"
