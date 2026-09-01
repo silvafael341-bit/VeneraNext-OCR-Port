@@ -6,11 +6,18 @@ on:
       - rebuild-venera-ocr-integrated
 
 permissions:
+  actions: write
   contents: read
 
 jobs:
   trigger:
     runs-on: ubuntu-22.04
     steps:
-      - name: Trigger main Android build
-        run: echo "Android OCR build trigger is active"
+      - name: Dispatch Android OCR build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run android-ocr-build.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref rebuild-venera-ocr-integrated
+          echo "Android OCR build dispatched."
