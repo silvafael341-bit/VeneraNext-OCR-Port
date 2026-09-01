@@ -83,3 +83,5 @@ jobs:
           name: VeneraNext-OCR-debug
           path: /tmp/apk-output/VeneraNext-OCR-debug.apk
           if-no-files-found: error
+
+# CI trigger after GitHub Actions was enabled.
