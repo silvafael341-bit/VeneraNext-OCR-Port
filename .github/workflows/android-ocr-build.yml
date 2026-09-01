@@ -26,17 +26,19 @@ jobs:
 
       - name: Configure Java 17
         run: |
-          JAVA_HOME_DIR="$(find /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk -maxdepth 2 -type d -name '17.*' -print -quit)"
-          if [ -z "$JAVA_HOME_DIR" ]; then
-            JAVA_HOME_DIR="$(find /usr/lib/jvm -maxdepth 1 -type d -iname '*temurin*17*' -print -quit)"
+          JAVA17="$(find /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk -type f -path '*/17*/bin/java' -print -quit)"
+          if [ -z "$JAVA17" ]; then
+            JAVA17="$(find /usr/lib/jvm -type f -path '*/java-17*/bin/java' -print -quit)"
           fi
-          if [ -z "$JAVA_HOME_DIR" ]; then
-            echo 'ERROR: Java 17 not found on runner.'
+          if [ -z "$JAVA17" ]; then
+            echo 'ERROR: Java 17 executable not found.'
             exit 1
           fi
+          JAVA_HOME_DIR="$(dirname "$(dirname "$JAVA17")")"
           echo "JAVA_HOME=$JAVA_HOME_DIR" >> "$GITHUB_ENV"
           echo "$JAVA_HOME_DIR/bin" >> "$GITHUB_PATH"
-          "$JAVA_HOME_DIR/bin/java" -version
+          echo "org.gradle.java.home=$JAVA_HOME_DIR" >> "$GITHUB_WORKSPACE/android/gradle.properties"
+          "$JAVA17" -version
 
       - name: Prepare Rust toolchain
         run: |
@@ -48,8 +50,9 @@ jobs:
       - name: Flutter dependencies
         run: flutter pub get --enforce-lockfile
 
-      - name: Verify Java used by Flutter
-        run: flutter doctor --verbose
+      - name: Verify Java used by Gradle
+        working-directory: android
+        run: ./gradlew --version
 
       - name: Build debug APK
         run: flutter build apk --debug --no-pub
